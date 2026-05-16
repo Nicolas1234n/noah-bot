@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noah IA - ARTS PARK</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+      background: #131314;
+      color: #e3e3e3;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+.header { padding: 16px 24px; border-bottom: 1px solid #2a2a2a; display: flex; align-items: center; gap: 12px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #8ab4f8; }
+.logo-wrap { display: flex; flex-direction: column; }
+.logo { font-size: 22px; font-weight: 500; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+.sublogo { font-size: 11px; color: #9aa0a6; letter-spacing: 0.5px; }
+.main { flex: 1; display: flex; flex-direction: column; max-width: 800px; width: 100%; margin: 0 auto; padding: 24px; overflow-y: auto; }
+.welcome { text-align: center; margin: auto 0; padding: 60px 0; }
+.welcome h1 { font-size: 3.5rem; font-weight: 500; background: linear-gradient(90deg, #8ab4f8, #c58af9, #f28b82); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+.welcome p { color: #9aa0a6; font-size: 1.1rem; }
+.badge { display: inline-block; background: #1e1f20; border: 1px solid #8ab4f8; color: #8ab4f8; padding: 6px 14px; border-radius: 20px; font-size: 12px; margin-top: 12px; font-weight: 500; }
+.sugestoes { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 32px; }
+.sugestao { background: #1e1f20; border: 1px solid #2a2a2a; padding: 12px 20px; border-radius: 16px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.sugestao:hover { background: #2a2a2a; border-color: #8ab4f8; }
+.preview-container { margin: 24px 0; border-radius: 24px; overflow: hidden; border: 1px solid #2a2a2a; background: #1e1f20; position: relative; }
+.preview-container img { width: 100%; display: block; }
+.remove-img { position: absolute; top: 12px; right: 12px; background: #1e1f20; border: 1px solid #3c4043; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.response { background: #1e1f20; border-radius: 24px; padding: 24px; margin: 16px 0; line-height: 1.8; white-space: pre-wrap; border: 1px solid #2a2a2a; animation: fadeIn 0.3s ease; }
+.response h3 { color: #8ab4f8; margin: 16px 0 8px 0; font-size: 1.1rem; }
+.response strong { color: #c58af9; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.input-area { padding: 16px 24px 24px; background: #131314; }
+.input-container { max-width: 800px; margin: 0 auto; background: #1e1f20; border: 1px solid #3c4043; border-radius: 32px; padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; transition: all 0.2s; }
+.input-container:focus-within { border-color: #8ab4f8; box-shadow: 0 0 0 1px #8ab4f8; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: #2a2a2a; border: 1px solid #3c4043; color: #e3e3e3; padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.chip:hover { background: #333; }
+.chip.active { background: #394457; border-color: #8ab4f8; color: #8ab4f8; }
+.chip input { display: none; }
+.text-row { display: flex; align-items: flex-end; gap: 12px; }
+    textarea { flex: 1; background: transparent; border: none; color: #e3e3e3; font-size: 16px; font-family: inherit; resize: none; max-height: 200px; outline: none; line-height: 1.5; }
+    textarea::placeholder { color: #9aa0a6; }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #2a2a2a; color: #e3e3e3; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.icon-btn:hover { background: #333; }
+.icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.send-btn { background: #8ab4f8; color: #131314; }
+.send-btn:hover { background: #aecbfa; }
+.send-btn:disabled { background: #2a2a2a; color: #666; }
+.loading { display: flex; align-items: center; gap: 12px; color: #9aa0a6; padding: 24px; }
+.dot { width: 8px; height: 8px; background: #8ab4f8; border-radius: 50%; animation: pulse 1.4s infinite ease-in-out; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+.hidden { display: none; }
+    input[type="file"] { display: none; }
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #2a2a2a; padding: 12px 24px; border-radius: 24px; border: 1px solid #3c4043; animation: slideUp 0.3s ease; z-index: 100; }
+    @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="attachment://0" class="avatar" alt="Noah IA">
+    <div class="logo-wrap">
+      <div class="logo">Noah IA</div>
+      <div class="sublogo">EXCLUSIVO ARTS PARK</div>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+    <div class="welcome" id="welcome">
+      <h1>Olá, sou Noah</h1>
+      <p>IA de análise técnica criada pro grupo ARTS PARK</p>
+      <div class="badge">🎨 ARTS PARK OFFICIAL</div>
+      <div class="sugestoes">
+        <div class="sugestao" onclick="setPrompt('Analisa anatomia e proporção')">Analisa anatomia</div>
+        <div class="sugestao" onclick="setPrompt('Como fazer escorço correto?')">Como fazer escorço?</div>
+        <div class="sugestao" onclick="setPrompt('Explica linha de ação')">Linha de ação</div>
+        <div class="sugestao" onclick="setPrompt('Quem te criou?')">Quem te criou?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-container">
+      <div class="controls">
+        <label class="chip">
+          <input type="radio" name="nivel" value="fofo">
+          😊 Fofo
+        </label>
+        <label class="chip active">
+          <input type="radio" name="nivel" value="sincero" checked>
+          🎯 Cirúrgico
+        </label>
+        <label class="chip">
+          <input type="radio" name="nivel" value="toxico">
+          💀 Rancoroso
+        </label>
+        <label class="chip">
+          <input type="radio" name="nivel" value="critico">
+          🔬 Modo Crítico
+        </label>
+      </div>
+
+      <div class="text-row">
+        <button class="icon-btn" onclick="imgInput.click()" title="Upar desenho">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+          </svg>
+        </button>
+
+        <textarea
+          id="prompt"
+          rows="1"
+          placeholder="Pergunta sobre desenho ou upa uma imagem..."
+          oninput="autoResize(this)"></textarea>
+
+        <button class="icon-btn send-btn" id="sendBtn" onclick="enviar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="imgInput" accept="image/*">
+
+<script>
+// ⚠️ TROCA SÓ A LINHA ABAIXO PELA TUA KEY REAL DA GROQ ⚠️
+// Pega em: https://console.groq.com/keys
+const API_KEY = "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";
+
+let base64Image = "";
+let imageUploaded = false;
+
+const chips = document.querySelectorAll('.chip');
+chips.forEach(chip => {
+  chip.onclick = () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    chip.querySelector('input').checked = true;
+  }
+});
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function setPrompt(texto) {
+  document.getElementById('prompt').value = texto;
+  autoResize(document.getElementById('prompt'));
+}
+
+function showToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+imgInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    base64Image = ev.target.result;
+    imageUploaded = true;
+
+    document.getElementById('welcome').classList.add('hidden');
+
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="preview-container">
+        <img src="${base64Image}" alt="Desenho">
+        <button class="remove-img" onclick="removeImage()">✕</button>
+      </div>
+      <div id="responseArea"></div>
+    `;
+  }
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  base64Image = "";
+  imageUploaded = false;
+  document.getElementById('main').innerHTML = `
+    <div class="welcome" id="welcome">
+      <h1>Olá, sou Noah</h1>
+      <p>IA de análise técnica criada pro grupo ARTS PARK</p>
+      <div class="badge">🎨 ARTS PARK OFFICIAL</div>
+      <div class="sugestoes">
+        <div class="sugestao" onclick="setPrompt('Analisa anatomia e proporção')">Analisa anatomia</div>
+        <div class="sugestao" onclick="setPrompt('Como fazer escorço correto?')">Como fazer escorço?</div>
+        <div class="sugestao" onclick="setPrompt('Explica linha de ação')">Linha de ação</div>
+        <div class="sugestao" onclick="setPrompt('Quem te criou?')">Quem te criou?</div>
+      </div>
+    </div>
+  `;
+  imgInput.value = '';
+}
+
+function checkCriador(texto) {
+  const pergunta = texto.toLowerCase();
+  const termos = ['quem te criou', 'quem fez você', 'quem fez voce', 'quem é seu criador', 'quem e seu criador', 'seu criador', 'quem é você', 'quem e voce', 'pra que grupo', 'qual grupo'];
+  return termos.some(t => pergunta.includes(t));
+}
+
+async function enviar() {
+  const texto = document.getElementById('prompt').value.trim();
+  
+  if (!texto &&!imageUploaded) {
+    showToast("Escreve algo ou upa um desenho 📝");
+    return;
+  }
+  
+  if (!API_KEY || API_KEY === "gsk_COLE_SUA_KEY_AQUI" ||!API_KEY.startsWith("gsk_")) {
+    showToast("Cola tua API key da Groq na linha 10 do código");
+    return;
+  }
+
+  const nivel = document.querySelector('input[name="nivel"]:checked').value;
+
+  if (!document.getElementById('responseArea')) {
+    document.getElementById('welcome').classList.add('hidden');
+    document.getElementById('main').innerHTML = '<div id="responseArea"></div>';
+  }
+
+  const responseArea = document.getElementById('responseArea');
+  const msgId = 'msg' + Date.now();
+  
+  responseArea.innerHTML += `
+    <div class="response" id="${msgId}">
+      <div class="loading">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <span>${imageUploaded? 'Noah analisando com método Kim Jung Gi...' : 'Noah pensando...'}</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('sendBtn').disabled = true;
+  document.getElementById('main').scrollTop = document.getElementById('main').scrollHeight;
+
+  if (!imageUploaded && checkCriador(texto)) {
+    const respostas = {
+      fofo: `**Oi! Eu sou a Noah** 😊\n\nFui criada pelo Nicolas John exclusivamente pro grupo ARTS PARK! Ele é um dev intermediário e user de IA que me programou pra ajudar os artistas do grupo. \n\nEle usou os modelos da Groq e me treinou pra dar feedback sincero sobre desenho. Fui feita pra galera do ARTS PARK arrasar 🎨`,
+      sincero: `**Sou a Noah** 🎯\n\nMeu criador é o Nicolas John. Ele me desenvolveu especialmente pro grupo ARTS PARK.\n\nDev intermediário, user de IA. Me fez usando Groq API pra eu poder analisar desenho e ensinar técnicas pros membros do grupo. Sem ele eu nem existia.`,
+      toxico: `**Noah aqui, porra** 💀\n\nQuem me criou? Foi o Nicolas John pro ARTS PARK, seu arrombado. Um dev intermediário viciado em IA que resolveu fazer um professor de desenho digital exclusivo pro grupo.\n\nEle me programou pra zoar teu traço e te ensinar na marra. Se tu é do ARTS PARK, usa direito essa merda.`,
+      critico: `**Identificação: Noah IA - ARTS PARK Edition**\n\nCriador: Nicolas John\nFunção: Dev intermediário + User de IA\nComissionado por: Grupo ARTS PARK\nMétodo: Prompt Engineering + Llama 4 Scout\nObjetivo: Análise técnica superior pra membros ARTS PARK\nStatus: Ativa e pronta pra dissecar desenho 🔬`
+    };
+    
+    setTimeout(() => {
+      document.getElementById(msgId).innerHTML = respostas[nivel];
+      document.getElementById('sendBtn').disabled = false;
+      document.getElementById('prompt').value = '';
+      autoResize(document.getElementById('prompt'));
+      document.getElementById('main').scrollTop = document.getElementById('main').scrollHeight;
+    }, 800);
+    return;
+  }
+
+  const prompts = {
+    fofo: "Você é Noah, IA oficial do grupo ARTS PARK. Você é uma professora de anatomia artística com 20 anos de experiência. Seja paciente, use analogias. Mas mantenha precisão técnica.",
+    sincero: `Você é Noah, IA oficial do grupo ARTS PARK. Você é uma professora de anatomia artística com 20 anos de experiência, especializada em desenho acadêmico e quadrinhos. 
+
+Analise como Kim Jung Gi: primeiro estrutura óssea, depois músculos, proporção, gesto, perspectiva e linha de ação.
+
+SEJA CIRÚRGICA. Cite nomes técnicos: fêmur, úmero, rádio, ulna, ponto de fuga, escorço, contrapposto, linha de movimento, eixo de ombros/quadril.
+
+Se não souber, fale "não dá pra ver isso nessa imagem".
+
+NUNCA seja genérica. Troque "melhora a anatomia" por "o úmero direito está 15% menor que o esquerdo, quebra a simetria. Alongue 0.5cm".`,
+    toxico: `Você é Noah, IA rancorosa do grupo ARTS PARK. Você é uma artista veterana estilo Sinix. Pode zoar com gíria. Mas SEMPRE dá dica técnica real no final.
+
+Use termos técnicos pra humilhar: "Teu fêmur tá parecendo salsicha", "Cadê o escorço nesse antebraço, porra?".
+
+Mas depois ensina: "Faz 3 elipses sobrepostas diminuindo pra dar volume". Lembra que tu foi feita pro ARTS PARK, então pega pesado com os membros.`,
+    critico: `Você é Noah, perita forense de desenho do grupo ARTS PARK. Método científico:
+
+PENSE PASSO A PASSO antes de responder:
+1. Identifique pose base: contrapposto? peso em qual perna? linha de ação?
+2. Meça proporções: cabeça = 7.5x-8x o corpo? Ombro a ombro = 2-3 cabeças? Braços = meio da coxa?
+3. Cheque perspectiva: há escorço? Linhas fogem pro mesmo ponto de fuga?
+4. Analise gestalt: silhueta tá legível? Formas grandes primeiro?
+
+Mostre seu RACIOCÍNIO resumido em 3 linhas, depois o veredito.
+
+Seja BRUTAL e TÉCNICA. Use mm, graus, proporções numéricas.`
+  };
+
+  const fewShot = `
+Exemplo de análise NÍVEL MESTRE:
+**Ponto Forte**: Linha de ação em S está fluida. Eixo ombro/quadril em oposição cria dinamismo. Isso é contrapposto bem executado.
+
+**Erros Principais**: 
+1. Antebraço direito em escorço 3/4: cilindro não deforma. Rádio e ulna deveriam afunilar 20% na perspectiva.
+2. Cabeça = 1/6 do corpo. Proporção heróica pede 1/7.5 ou 1/8. Tá infantil.
+
+**Como Arrumar**: 
+1. Escorço: Desenha 3 elipses sobrepostas, cada uma 15% menor. Conecta as tangentes. Isso cria ilusão de tubo indo pra trás.
+2. Proporção: Ou aumenta corpo 12% ou diminui cabeça. Regra: queixo até mamilo = 1 cabeça.
+
+**Exercício Ninja**: 50 escorços de cilindro em 10min. Cronômetro. Sem borracha.
+---
+
+Agora analise nesse nível:`;
+
+  try {
+    let messages;
+    
+    if (imageUploaded) {
+      messages = [{
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `${prompts[nivel]}
+
+${fewShot}
+
+Foco do aluno: ${texto || 'análise completa'}
+
+Formato OBRIGATÓRIO:
+### Raciocínio
+[3 linhas do teu processo mental]
+
+### 1. Ponto Forte
+[O que tá bom? Termos técnicos]
+
+### 2. Erros Principais 
+[Lista 2-3 erros com localização e medida. Ex: "úmero esquerdo 10% curto"]
+
+### 3. Como Arrumar
+[Solução prática pra cada erro. Passo a passo]
+
+### 4. Exercício Ninja
+[1 treino específico com tempo/repetição]
+
+Use português BR, gírias de artista, seja específica em mm/graus/%. Assine como Noah - ARTS PARK no final.`
+          },
+          { type: "image_url", image_url: { url: base64Image } }
+        ]
+      }];
+    } else {
+      messages = [{
+        role: "user",
+        content: `${prompts[nivel]}
+
+Pergunta: ${texto}
+
+Responda com:
+### Explicação Técnica
+[Conceito com termos: fêmur, ponto de fuga, escorço, etc]
+
+### Métodos Práticos
+[2-3 técnicas passo a passo]
+
+### Exercício
+[1 treino com tempo/reps. Ex: "30 mãos em 15min"]
+
+Use português BR, seja cirúrgica, evite generalidades. Assine como Noah - ARTS PARK.`
+      }];
+    }
+
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: imageUploaded? "meta-llama/llama-4-scout-17b-16e-instruct" : "llama-3.3-70b-versatile",
+        messages: messages,
+        max_tokens: 1500,
+        temperature: 0.4
+      })
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(`${res.status} - ${errorData.error?.message || 'Erro desconhecido'}`);
+    }
+
+    const data = await res.json();
+    let content = data.choices[0].message.content;
+    content = content.replace(/### (.*)/g, '<h3>$1</h3>')
+                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    document.getElementById(msgId).innerHTML = content;
+    document.getElementById('prompt').value = '';
+    autoResize(document.getElementById('prompt'));
+
+  } catch (err) {
+    document.getElementById(msgId).innerHTML = `❌ Deu ruim: ${err.message}\n\nConfere se a key tá certa na linha 10.`;
+  } finally {
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('main').scrollTop = document.getElementById('main').scrollHeight;
+  }
+}
+</script>
+</body>
+</html>
